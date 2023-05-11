@@ -9,4 +9,4 @@ This app directly interacts with the reDeploy core instance.
 
 ## More Information
 
-In our [Documentation](https://redeploy.readthedocs.io/en/latest/)
+In our [Documentation](https://redeploy-docs.readthedocs.io/en/latest/)
