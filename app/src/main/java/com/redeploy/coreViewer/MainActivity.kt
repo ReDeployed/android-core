@@ -32,8 +32,9 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-enum class ManagerScreens(val title: String) {
-    Start(title = "Overview")
+enum class coreScreens(val title: String) {
+    Start(title = "Overview"),
+    Login(title = "Overview")
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -52,9 +53,9 @@ fun DeviceManagerApp(modifier: Modifier = Modifier) {
             val viewModel: MainViewModel = viewModel()
             NavHost(
                 navController = navController,
-                startDestination = ManagerScreens.Start.name,
+                startDestination = coreScreens.Start.name,
             ) {
-                composable(route = ManagerScreens.Start.name) {
+                composable(route = coreScreens.Start.name) {
                     MainScreen(
                         uiState = viewModel.uiState
                     )
