@@ -19,6 +19,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.redeploy.coreViewer.ui.theme.CoreViewerTheme
 import com.redeploy.coreViewer.ui.MainViewModel
+import com.redeploy.coreViewer.ui.screens.LoginScreen
 import com.redeploy.coreViewer.ui.screens.MainScreen
 
 class MainActivity : ComponentActivity() {
@@ -34,7 +35,7 @@ class MainActivity : ComponentActivity() {
 
 enum class coreScreens(val title: String) {
     Start(title = "Overview"),
-    Login(title = "Overview")
+    Login(title = "Login")
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -53,11 +54,18 @@ fun DeviceManagerApp(modifier: Modifier = Modifier) {
             val viewModel: MainViewModel = viewModel()
             NavHost(
                 navController = navController,
-                startDestination = coreScreens.Start.name,
+                startDestination = coreScreens.Login.name,
             ) {
                 composable(route = coreScreens.Start.name) {
                     MainScreen(
                         uiState = viewModel.uiState
+                    )
+                }
+                composable(route = coreScreens.Login.name) {
+                    LoginScreen(
+                        onLoginSubmit = {
+                            viewModel.doLogin(navController, it)
+                        }
                     )
                 }
             }

@@ -15,6 +15,7 @@ import com.redeploy.coreViewer.network.LoginRequest
 fun LoginScreen(
     onLoginSubmit: (req: LoginRequest) -> Unit
 ) {
+    var urlIn by remember { mutableStateOf("") }
     var tokenIn by remember { mutableStateOf("") }
     Column(
         modifier = Modifier
@@ -26,18 +27,33 @@ fun LoginScreen(
         Row (
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically,
+                .padding(8.dp),
+            horizontalArrangement = Arrangement.Center
+        ) {
+            OutlinedTextField(
+                value = urlIn,
+                onValueChange = { urlIn = it },
+                singleLine = true,
+                label = { Text("API URL") }
+            )
+        }
+        Row (
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(8.dp),
             horizontalArrangement = Arrangement.Center
         ) {
             OutlinedTextField(
                 value = tokenIn,
                 onValueChange = { tokenIn = it },
                 singleLine = true,
-                label = { Text("Password") },
+                label = { Text("PSK") },
                 visualTransformation = PasswordVisualTransformation()
             )
         }
+        Spacer(modifier = Modifier
+            .padding(40.dp),
+        )
     }
     Box(
         contentAlignment = Alignment.BottomCenter,
@@ -48,6 +64,7 @@ fun LoginScreen(
         FloatingActionButton(
             onClick = { onLoginSubmit(
                 LoginRequest(
+                    urlIn,
                     tokenIn
                 )
             ) },
