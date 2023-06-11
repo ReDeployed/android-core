@@ -35,6 +35,7 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+
 enum class coreScreens(val title: String) {
     Start(title = "Overview"),
     Login(title = "Login")
