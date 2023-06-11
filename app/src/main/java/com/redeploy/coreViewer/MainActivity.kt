@@ -17,6 +17,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.redeploy.coreViewer.ui.DatabaseApiApp
 import com.redeploy.coreViewer.ui.theme.CoreViewerTheme
 import com.redeploy.coreViewer.ui.MainViewModel
 import com.redeploy.coreViewer.ui.screens.LoginScreen
@@ -27,7 +28,8 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             CoreViewerTheme {
-                DeviceManagerApp()
+                //DeviceManagerApp() <-- Amfoch hops gnumman
+                DatabaseApiApp() // Da Da Da - Datenautobahn
             }
         }
     }
