@@ -8,14 +8,16 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import com.redeploy.coreViewer.coreScreens
-import com.redeploy.coreViewer.network.ApiResponse
+import com.redeploy.coreViewer.network.GenericResponse
+import com.redeploy.coreViewer.network.ListResponse
 import com.redeploy.coreViewer.network.LoginRequest
 import com.redeploy.coreViewer.network.MainApi
 import kotlinx.coroutines.launch
 import retrofit2.Response
 
 sealed interface UiState {
-    data class Success(val response: Response<ApiResponse>) : UiState
+    data class StatusSuccess(val response: Response<GenericResponse>) : UiState
+    data class ListSuccess(val response: Response<ListResponse>) : UiState
     object Error : UiState
     object Loading : UiState
 }
@@ -30,14 +32,16 @@ class MainViewModel : ViewModel() {
         viewModelScope.launch {
             try {
                 uiState = UiState.Loading
-                nav.navigate(coreScreens.Start.name)
                 val result = api.login(
                     "${req.url}api/auth",
                     req
                 )
                 accessToken = result.body()?.msg.toString()
                 apiURL = req.url
-                getStatus()
+                if (result.isSuccessful) {
+                    nav.navigate(coreScreens.Start.name)
+                    getListing()
+                }
             } catch (e: Throwable) {
                 UiState.Error
             }
@@ -46,11 +50,32 @@ class MainViewModel : ViewModel() {
     private fun getStatus() {
         viewModelScope.launch {
             uiState = try {
-                val resultDevices = api.getStatus(
+                val result = api.getStatus(
                     "${apiURL}api/status",
                     accessToken
                 )
-                UiState.Success(resultDevices)
+                if (result.isSuccessful) {
+                    UiState.StatusSuccess(result)
+                } else {
+                    UiState.Error
+                }
+            } catch (e: Throwable) {
+                UiState.Error
+            }
+        }
+    }
+    private fun getListing() {
+        viewModelScope.launch {
+            uiState = try {
+                val resultDevices = api.getListing(
+                    "${apiURL}api/listApp",
+                    accessToken
+                )
+                if (resultDevices.isSuccessful) {
+                    UiState.ListSuccess(resultDevices)
+                } else {
+                    UiState.Error
+                }
             } catch (e: Throwable) {
                 UiState.Error
             }

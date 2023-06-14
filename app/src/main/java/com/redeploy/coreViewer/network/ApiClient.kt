@@ -75,9 +75,11 @@ private fun getUnsafeOkHttpClient(): OkHttpClient? {
 
 interface ApiService {
     @POST
-    suspend fun login(@Url url: String, @Body request: LoginRequest): Response<ApiResponse>
+    suspend fun login(@Url url: String, @Body request: LoginRequest): Response<LoginResponse>
     @GET
-    suspend fun getStatus(@Url url: String, @Header("Authorization") token: String): Response<ApiResponse>
+    suspend fun getStatus(@Url url: String, @Header("Authorization") token: String): Response<GenericResponse>
+    @GET
+    suspend fun getListing(@Url url: String, @Header("Authorization") token: String): Response<ListResponse>
 }
 
 object MainApi {

@@ -1,13 +1,16 @@
 package com.redeploy.coreViewer.ui.screens
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
-import com.redeploy.coreViewer.network.ApiResponse
+import androidx.compose.ui.unit.sp
+import com.redeploy.coreViewer.network.GenericResponse
+import com.redeploy.coreViewer.network.ListResponse
 import com.redeploy.coreViewer.ui.UiState
 import retrofit2.Response
 
@@ -32,8 +35,8 @@ fun Error(modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun Success(
-    data: Response<ApiResponse>,
+fun StatusSuccess(
+    data: Response<GenericResponse>,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -71,12 +74,68 @@ fun Success(
 }
 
 @Composable
+fun ListSuccess(
+    data: Response<ListResponse>,
+    modifier: Modifier = Modifier
+) {
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier = modifier.fillMaxSize()
+    ) {
+        LazyColumn {
+            var listData = data.body()?.msg
+            items(listData!!) { item ->
+                Row(
+                    modifier = modifier
+                        .fillMaxWidth()
+                        .padding(4.dp)
+                ) {
+                    ElevatedCard(
+                        modifier = modifier
+                            .fillMaxWidth()
+                            .padding(2.dp)
+                    ) {
+                        Text(
+                            modifier = modifier
+                                .padding(6.dp),
+                            text = "ID: " + item.id
+                        )
+                        Text(
+                            modifier = modifier
+                                .padding(6.dp),
+                            text = "VERSION: " + item.version.`product-version`
+                        )
+                    }
+                }
+            }
+        }
+        Box(
+            contentAlignment = Alignment.BottomEnd,
+            modifier = modifier
+                .fillMaxWidth()
+                .fillMaxHeight()
+        ) {
+            FloatingActionButton(
+                onClick = {},
+                modifier = Modifier.padding(24.dp)
+            ) {
+                Text(
+                    text = "+",
+                    fontSize = 16.sp
+                )
+            }
+        }
+    }
+}
+
+@Composable
 fun MainScreen(
     uiState: UiState,
     modifier: Modifier = Modifier
 ) {
     when (uiState) {
-        is UiState.Success -> Success(uiState.response, modifier)
+        is UiState.StatusSuccess -> StatusSuccess(uiState.response, modifier)
+        is UiState.ListSuccess -> ListSuccess(uiState.response, modifier)
         is UiState.Loading -> Loading(modifier)
         is UiState.Error -> Error(modifier)
     }
