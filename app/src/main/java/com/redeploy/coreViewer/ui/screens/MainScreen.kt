@@ -1,14 +1,25 @@
 package com.redeploy.coreViewer.ui.screens
 
+import android.graphics.Picture
+import android.graphics.drawable.Drawable
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.snapshots.SnapshotApplyResult
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.redeploy.coreViewer.R
 import com.redeploy.coreViewer.network.GenericResponse
 import com.redeploy.coreViewer.network.ListResponse
 import com.redeploy.coreViewer.ui.UiState
@@ -18,7 +29,9 @@ import retrofit2.Response
 fun Loading(modifier: Modifier = Modifier) {
     Box(
         contentAlignment = Alignment.Center,
-        modifier = modifier.fillMaxSize()
+        modifier = modifier
+            .fillMaxSize()
+            .background(colorResource(id = R.color.Background))
     ) {
         CircularProgressIndicator()
     }
@@ -26,11 +39,34 @@ fun Loading(modifier: Modifier = Modifier) {
 
 @Composable
 fun Error(modifier: Modifier = Modifier) {
-    Box(
-        contentAlignment = Alignment.Center,
-        modifier = modifier.fillMaxSize()
+
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center,
+        modifier = modifier
+            .fillMaxSize()
+            .background(colorResource(id = R.color.Background))
     ) {
-        Text("gah, something failed >.<")
+        Text(
+            text = "Connection could not be established",
+            fontFamily = FontFamily.Monospace,
+            color = Color.White,
+            fontSize = 16.sp
+        )
+        Spacer(modifier = Modifier.padding(16.dp))
+        Text(
+            text = "Please try again",
+            fontFamily = FontFamily.Monospace,
+            color = Color.White,
+            fontSize = 16.sp
+        )
+        Spacer(modifier = Modifier.padding(16.dp))
+        Text(
+            text = ":(",
+            fontFamily = FontFamily.Monospace,
+            color = Color.White,
+            fontSize = 26.sp
+        )
     }
 }
 
@@ -140,3 +176,5 @@ fun MainScreen(
         is UiState.Error -> Error(modifier)
     }
 }
+
+
