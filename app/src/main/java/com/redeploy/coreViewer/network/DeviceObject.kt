@@ -6,7 +6,9 @@ import kotlinx.serialization.SerialName
 data class LoginRequest (
     val url: String,
     val key: String
-)
+) {
+    val token = ""
+}
 
 @Serializable
 data class LoginResponse (
