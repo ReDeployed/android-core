@@ -16,6 +16,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -112,24 +113,43 @@ fun StatusSuccess(
 @Composable
 fun ListSuccess(
     data: Response<ListResponse>,
+    entryNewAction: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Box(
-        contentAlignment = Alignment.Center,
-        modifier = modifier.fillMaxSize()
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(colorResource(id = R.color.Background)),
+        verticalArrangement = Arrangement.SpaceBetween
     ) {
-        LazyColumn {
+        Text(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(20.dp),
+            text = "Active Firewalls",
+            color = Color.White,
+            textAlign = TextAlign.Center,
+            fontSize = 24.sp,
+            fontFamily = FontFamily.Monospace
+        )
+        LazyColumn(
+            modifier = Modifier
+                .background(colorResource(id = R.color.Background)),
+        ) {
             var listData = data.body()?.msg
             items(listData!!) { item ->
                 Row(
-                    modifier = modifier
+                    modifier = Modifier
                         .fillMaxWidth()
-                        .padding(4.dp)
+                        .padding(8.dp),
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
                     ElevatedCard(
                         modifier = modifier
                             .fillMaxWidth()
-                            .padding(2.dp)
+                            .padding(8.dp)
+                            .background(colorResource(id = R.color.Background)),
                     ) {
                         Text(
                             modifier = modifier
@@ -139,27 +159,38 @@ fun ListSuccess(
                         Text(
                             modifier = modifier
                                 .padding(6.dp),
-                            text = "VERSION: " + item.version.`product-version`
+                            text = item.version.`product-version`
+                        )
+                        Text(
+                            modifier = modifier
+                                .padding(6.dp),
+                            text = item.version.`os-kernel-version`
+                        )
+                        Text(
+                            modifier = modifier
+                                .padding(6.dp),
+                            text = item.version.`os-edition`
                         )
                     }
                 }
             }
         }
-        Box(
-            contentAlignment = Alignment.BottomEnd,
-            modifier = modifier
-                .fillMaxWidth()
-                .fillMaxHeight()
+        FloatingActionButton(
+            onClick = { entryNewAction() },
+            modifier = Modifier
+                .padding(30.dp)
+                .fillMaxWidth(),
+            containerColor = colorResource(id = R.color.Button),
+            elevation = FloatingActionButtonDefaults.elevation(14.dp)
         ) {
-            FloatingActionButton(
-                onClick = {},
-                modifier = Modifier.padding(24.dp)
-            ) {
-                Text(
-                    text = "+",
-                    fontSize = 16.sp
-                )
-            }
+            Text(
+                modifier = Modifier
+                    .padding(8.dp),
+                text = "New Device",
+                color = Color.White,
+                fontSize = 16.sp,
+                fontFamily = FontFamily.Monospace
+            )
         }
     }
 }
@@ -167,11 +198,12 @@ fun ListSuccess(
 @Composable
 fun MainScreen(
     uiState: UiState,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    entryNewAction: () -> Unit,
 ) {
     when (uiState) {
         is UiState.StatusSuccess -> StatusSuccess(uiState.response, modifier)
-        is UiState.ListSuccess -> ListSuccess(uiState.response, modifier)
+        is UiState.ListSuccess -> ListSuccess(uiState.response, entryNewAction, modifier)
         is UiState.Loading -> Loading(modifier)
         is UiState.Error -> Error(modifier)
     }

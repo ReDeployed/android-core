@@ -7,7 +7,8 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
-import com.redeploy.coreViewer.coreScreens
+import com.redeploy.coreViewer.CoreScreens
+import com.redeploy.coreViewer.network.AddRequest
 import com.redeploy.coreViewer.network.GenericResponse
 import com.redeploy.coreViewer.network.ListResponse
 import com.redeploy.coreViewer.network.LoginRequest
@@ -29,6 +30,7 @@ class MainViewModel : ViewModel() {
     private var accessToken: String by mutableStateOf("")
 
     fun doLogin(nav: NavController, req: LoginRequest) {
+        var success = false
         viewModelScope.launch {
             try {
                 uiState = UiState.Loading
@@ -39,11 +41,47 @@ class MainViewModel : ViewModel() {
                 accessToken = result.body()?.msg.toString()
                 apiURL = req.url
                 if (result.isSuccessful) {
-                    nav.navigate(coreScreens.Start.name)
-                    getListing()
+                    success = true
                 }
             } catch (e: Throwable) {
-                UiState.Error
+                success = false
+                nav.navigate(CoreScreens.Login.name)
+            }
+        }.invokeOnCompletion {
+            if (success) {
+                nav.navigate(CoreScreens.Start.name) {
+                    popUpTo(0)
+                }
+                getListing()
+            }
+        }
+    }
+    fun doAdd(nav: NavController, req: AddRequest) {
+        var success = false
+        viewModelScope.launch {
+            try {
+                uiState = UiState.Loading
+                val result = api.addApp(
+                    "${apiURL}api/addApp",
+                    req,
+                    accessToken
+                )
+                if (result.isSuccessful && result.body()?.msg == "Success") {
+                    success = true;
+                }
+            } catch (e: Throwable) {
+                success = false
+                uiState = UiState.Error
+                nav.navigate(CoreScreens.Start.name) {
+                    popUpTo(0)
+                }
+            }
+        }.invokeOnCompletion {
+            if (success) {
+                nav.navigate(CoreScreens.Start.name) {
+                    popUpTo(0)
+                }
+                getListing()
             }
         }
     }
@@ -64,8 +102,9 @@ class MainViewModel : ViewModel() {
             }
         }
     }
-    private fun getListing() {
+    fun getListing() {
         viewModelScope.launch {
+            uiState = UiState.Loading
             uiState = try {
                 val resultDevices = api.getListing(
                     "${apiURL}api/listApp",

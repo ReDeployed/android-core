@@ -5,14 +5,11 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -21,6 +18,7 @@ import com.redeploy.coreViewer.ui.theme.CoreViewerTheme
 import com.redeploy.coreViewer.ui.MainViewModel
 import com.redeploy.coreViewer.ui.screens.LoginScreen
 import com.redeploy.coreViewer.ui.screens.MainScreen
+import com.redeploy.coreViewer.ui.screens.NewScreen
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -33,17 +31,18 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-enum class coreScreens(val title: String) {
+enum class CoreScreens(val title: String) {
     Start(title = "Overview"),
-    Login(title = "Login")
+    Login(title = "Login"),
+    New(title = "New")
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DeviceManagerApp(modifier: Modifier = Modifier) {
     Scaffold(
-        modifier = modifier.fillMaxSize(),
-        topBar = { CenterAlignedTopAppBar(title = { Text(stringResource(R.string.app_name)) }) }
+        modifier = modifier
+            .fillMaxSize()
     ) {
         Surface(
             modifier = Modifier
@@ -54,17 +53,27 @@ fun DeviceManagerApp(modifier: Modifier = Modifier) {
             val viewModel: MainViewModel = viewModel()
             NavHost(
                 navController = navController,
-                startDestination = coreScreens.Login.name,
+                startDestination = CoreScreens.Login.name,
             ) {
-                composable(route = coreScreens.Start.name) {
+                composable(route = CoreScreens.Start.name) {
                     MainScreen(
-                        uiState = viewModel.uiState
+                        uiState = viewModel.uiState,
+                        entryNewAction = {
+                            navController.navigate(CoreScreens.New.name)
+                        }
                     )
                 }
-                composable(route = coreScreens.Login.name) {
+                composable(route = CoreScreens.Login.name) {
                     LoginScreen(
                         onLoginSubmit = {
                             viewModel.doLogin(navController, it)
+                        }
+                    )
+                }
+                composable(route = CoreScreens.New.name) {
+                    NewScreen(
+                        onAddSubmit = {
+                            viewModel.doAdd(navController, it)
                         }
                     )
                 }

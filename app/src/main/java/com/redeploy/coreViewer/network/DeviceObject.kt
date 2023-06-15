@@ -10,6 +10,10 @@ data class LoginRequest (
     val token = ""
 }
 
+data class AddRequest (
+    val ip: String,
+)
+
 @Serializable
 data class LoginResponse (
     var type: String,

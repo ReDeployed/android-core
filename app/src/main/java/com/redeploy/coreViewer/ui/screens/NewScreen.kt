@@ -15,16 +15,15 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.redeploy.coreViewer.R
+import com.redeploy.coreViewer.network.AddRequest
 import com.redeploy.coreViewer.network.LoginRequest
-
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LoginScreen(
-    onLoginSubmit: (req: LoginRequest) -> Unit
+fun NewScreen(
+    onAddSubmit: (req: AddRequest) -> Unit
 ) {
-    var urlIn by remember { mutableStateOf("") }
-    var tokenIn by remember { mutableStateOf("") }
+    var ipIn by remember { mutableStateOf("") }
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -55,36 +54,20 @@ fun LoginScreen(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 OutlinedTextField(
-                    value = urlIn,
-                    onValueChange = { urlIn = it },
+                    value = ipIn,
+                    onValueChange = { ipIn = it },
                     singleLine = true,
-                    label = { Text("API URL") }
-                )
-            }
-            Row (
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(8.dp),
-                horizontalArrangement = Arrangement.Center,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                OutlinedTextField(
-                    value = tokenIn,
-                    onValueChange = { tokenIn = it },
-                    singleLine = true,
-                    label = { Text("PSK") },
-                    visualTransformation = PasswordVisualTransformation()
+                    label = { Text("IP Address") }
                 )
             }
         }
         FloatingActionButton(
             onClick = {
-                onLoginSubmit(
-                    LoginRequest(
-                        urlIn,
-                        tokenIn
-                )
-            ) },
+                onAddSubmit(
+                    AddRequest (
+                        ipIn
+                    )
+                ) },
             modifier = Modifier
                 .padding(30.dp)
                 .fillMaxWidth(),
@@ -94,18 +77,17 @@ fun LoginScreen(
             Text(
                 modifier = Modifier
                     .padding(8.dp),
-                text = "Submit",
+                text = "Add",
                 color = Color.White,
                 fontSize = 16.sp,
                 fontFamily = FontFamily.Monospace
             )
         }
     }
-
 }
 
 @Preview
 @Composable
-fun LoginPreview() {
-    LoginScreen(onLoginSubmit = {})
+fun NewPreview() {
+    NewScreen(onAddSubmit = {})
 }
