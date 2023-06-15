@@ -13,12 +13,15 @@ import com.redeploy.coreViewer.network.GenericResponse
 import com.redeploy.coreViewer.network.ListResponse
 import com.redeploy.coreViewer.network.LoginRequest
 import com.redeploy.coreViewer.network.MainApi
+import com.redeploy.coreViewer.network.ViewRequest
+import com.redeploy.coreViewer.network.ViewResponse
 import kotlinx.coroutines.launch
 import retrofit2.Response
 
 sealed interface UiState {
     data class StatusSuccess(val response: Response<GenericResponse>) : UiState
     data class ListSuccess(val response: Response<ListResponse>) : UiState
+    data class ViewSuccess(val response: Response<ViewResponse>) : UiState
     object Error : UiState
     object Loading : UiState
 }
@@ -33,6 +36,7 @@ class MainViewModel : ViewModel() {
         var success = false
         viewModelScope.launch {
             try {
+                nav.navigate(CoreScreens.Start.name)
                 uiState = UiState.Loading
                 val result = api.login(
                     "${req.url}api/auth",
@@ -82,6 +86,23 @@ class MainViewModel : ViewModel() {
                     popUpTo(0)
                 }
                 getListing()
+            }
+        }
+    }
+    fun doView(req: ViewRequest) {
+        viewModelScope.launch {
+            try {
+                uiState = UiState.Loading
+                val result = api.viewApp(
+                    "${apiURL}api/viewApp",
+                    req,
+                    accessToken
+                )
+                if (result.isSuccessful) {
+                    uiState = UiState.ViewSuccess(result)
+                }
+            } catch (e: Throwable) {
+                uiState = UiState.Error
             }
         }
     }

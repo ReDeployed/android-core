@@ -14,6 +14,10 @@ data class AddRequest (
     val ip: String,
 )
 
+data class ViewRequest (
+    val id: String,
+)
+
 @Serializable
 data class LoginResponse (
     var type: String,
@@ -30,6 +34,12 @@ data class GenericResponse(
 data class ListResponse(
     var type: String,
     var msg: List<Message>
+)
+
+@Serializable
+data class ViewResponse(
+    var type: String,
+    var msg: Message
 )
 
 data class Message(

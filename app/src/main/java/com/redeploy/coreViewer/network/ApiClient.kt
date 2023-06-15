@@ -78,6 +78,8 @@ interface ApiService {
     suspend fun login(@Url url: String, @Body request: LoginRequest): Response<LoginResponse>
     @POST
     suspend fun addApp(@Url url: String, @Body request: AddRequest, @Header("Authorization") token: String): Response<GenericResponse>
+    @POST
+    suspend fun viewApp(@Url url: String, @Body request: ViewRequest, @Header("Authorization") token: String): Response<ViewResponse>
     @GET
     suspend fun getStatus(@Url url: String, @Header("Authorization") token: String): Response<GenericResponse>
     @GET

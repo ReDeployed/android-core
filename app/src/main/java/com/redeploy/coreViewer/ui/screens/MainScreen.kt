@@ -7,8 +7,13 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotApplyResult
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -23,6 +28,7 @@ import androidx.compose.ui.unit.sp
 import com.redeploy.coreViewer.R
 import com.redeploy.coreViewer.network.GenericResponse
 import com.redeploy.coreViewer.network.ListResponse
+import com.redeploy.coreViewer.network.ViewResponse
 import com.redeploy.coreViewer.ui.UiState
 import retrofit2.Response
 
@@ -110,10 +116,12 @@ fun StatusSuccess(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ListSuccess(
     data: Response<ListResponse>,
     entryNewAction: () -> Unit,
+    entryViewAction: (id: String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -150,6 +158,11 @@ fun ListSuccess(
                             .fillMaxWidth()
                             .padding(8.dp)
                             .background(colorResource(id = R.color.Background)),
+                        onClick = {
+                            entryViewAction(
+                                "CheckAPPL"
+                            )
+                        }
                     ) {
                         Text(
                             modifier = modifier
@@ -196,17 +209,149 @@ fun ListSuccess(
 }
 
 @Composable
+fun ViewScreen(
+    data: Response<ViewResponse>,
+    onBack: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(colorResource(id = R.color.Background)),
+        verticalArrangement = Arrangement.SpaceBetween
+    ) {
+        Text(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(20.dp),
+            text = "Device Details",
+            color = Color.White,
+            textAlign = TextAlign.Center,
+            fontSize = 24.sp,
+            fontFamily = FontFamily.Monospace
+        )
+        ElevatedCard(
+            modifier = modifier
+                .fillMaxWidth()
+                .padding(8.dp)
+                .background(colorResource(id = R.color.Background)),
+        ) {
+            Text(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(20.dp),
+                text = "Basic",
+                color = Color.White,
+                textAlign = TextAlign.Center,
+                fontSize = 20.sp,
+            )
+            Row (
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(8.dp),
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                data.body()?.msg?.let {
+                    Text(text = it.id)
+                }
+            }
+            Row (
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(8.dp),
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                data.body()?.msg?.let {
+                    Text(text = it.version.`product-version`)
+                }
+            }
+            Row (
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(8.dp),
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                data.body()?.msg?.let {
+                    Text(text = it.updated_at)
+                }
+            }
+            Row (
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(8.dp),
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                var listData = data.body()?.msg?.interfaces!!.objects
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(20.dp),
+                        text = "Interfaces",
+                        color = Color.White,
+                        textAlign = TextAlign.Center,
+                        fontSize = 20.sp,
+                    )
+                    listData.forEach { item ->
+                        Row(
+                            modifier = Modifier
+                                .padding(2.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(text = item.name)
+                        }
+                        Row(
+                            modifier = Modifier
+                                .padding(2.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(text = item.`ipv4-address` + "/" + item.`ipv4-mask-length`)
+                        }
+                    }
+                }
+            }
+        }
+        FloatingActionButton(
+            onClick = { onBack() },
+            modifier = Modifier
+                .padding(30.dp)
+                .fillMaxWidth(),
+            containerColor = colorResource(id = R.color.Button),
+            elevation = FloatingActionButtonDefaults.elevation(14.dp)
+        ) {
+            Text(
+                modifier = Modifier
+                    .padding(8.dp),
+                text = "Back",
+                color = Color.White,
+                fontSize = 16.sp,
+                fontFamily = FontFamily.Monospace
+            )
+        }
+    }
+}
+
+@Composable
 fun MainScreen(
     uiState: UiState,
     modifier: Modifier = Modifier,
+    entryViewAction: (id: String) -> Unit,
     entryNewAction: () -> Unit,
+    onBack: () -> Unit
 ) {
     when (uiState) {
         is UiState.StatusSuccess -> StatusSuccess(uiState.response, modifier)
-        is UiState.ListSuccess -> ListSuccess(uiState.response, entryNewAction, modifier)
+        is UiState.ListSuccess -> ListSuccess(uiState.response, entryNewAction, entryViewAction, modifier)
+        is UiState.ViewSuccess -> ViewScreen(uiState.response, onBack, modifier)
         is UiState.Loading -> Loading(modifier)
         is UiState.Error -> Error(modifier)
     }
 }
-
-
